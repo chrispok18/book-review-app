@@ -1,21 +1,27 @@
-# Use Node.js LTS as base image
-FROM node:18
+# Supported Node.js LTS base image
+FROM node:20-alpine
 
-# Set working directory
+# Working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files first so the dependency layer is cached
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application files
+# Copy the frontend source code
 COPY . .
 
-# Expose the Next.js port
+# Next.js embeds NEXT_PUBLIC_* values at build time
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Create the production build
+RUN npm run build
+
+# Frontend port
 EXPOSE 3000
 
-# Start Next.js in development mode
-CMD ["npm", "run", "dev"]
-
+# Start Next.js in production mode
+CMD ["npm", "start"]

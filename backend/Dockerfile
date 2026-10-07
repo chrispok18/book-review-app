@@ -1,21 +1,20 @@
-# Use Node.js LTS as base image
-FROM node:18
+# Supported Node.js LTS base image
+FROM node:20-alpine
 
-# Set working directory
+# Working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files first so the dependency layer is cached
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application files
+# Copy the backend source code
 COPY . .
 
-# Expose the port the backend runs on
+# Backend API port
 EXPOSE 3001
 
-# Start the backend server
+# Start the backend (the repo has no start script)
 CMD ["node", "src/server.js"]
-
